@@ -50,10 +50,10 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - mountPath: /app/data/configs
+            - mountPath: /config
               name: <CHARTNAME>-config
-            - mountPath: /app/data/icons
-              name: <CHARTNAME>-icons
+            - mountPath: /storage
+              name: <CHARTNAME>-storage
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

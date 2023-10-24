@@ -98,10 +98,10 @@ storage:
       storageType: storage
 # Additional volumes on the output Deployment definition.
 volumes: 
-  - name: example-config             
+  - name: <CHARTNAME>-config             
     persistentVolumeClaim:
       claimName: config-nfs-pv-claim
-  - name: homarr-storage
+  - name: <CHARTNAME>-storage
     persistentVolumeClaim:
       claimName: storage-nfs-pv-claim
 
