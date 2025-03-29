@@ -48,7 +48,7 @@ spec:
           {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            {{ range .Values.new_service }}
+            {{ range .Values.service }}
             - name: {{ .name }}
               containerPort: {{ .port }}
               protocol: {{ .protocol }}
@@ -66,13 +66,15 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-          {{ range $.Values.new_storage }}
+          {{ range $.Values.storage }}
             - mountPath: {{ .container_path }}
               name: {{ .name }}
           {{ end }}
-      {{- with .Values.volumes }}
       volumes:
-        {{- toYaml . | nindent 8 }}
+      {{ range $.Values.storage }}
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ .name }}-pvc
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
