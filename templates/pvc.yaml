@@ -15,5 +15,6 @@ spec:
   selector:
     matchLabels:
       appServed: {{ .appServed }}
+      configServed: {{ .name }}
       storageType: {{ .type }}
 {{ end }}

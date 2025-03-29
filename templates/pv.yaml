@@ -5,7 +5,8 @@ kind: PersistentVolume
 metadata:
     name: {{ .name }}-pv
     labels:
-      appServed: {{ .appServed }} 
+      appServed: {{ .appServed }}
+      configServed: {{ .name }}
       storageType: {{ .type }}
 spec:
   capacity:
