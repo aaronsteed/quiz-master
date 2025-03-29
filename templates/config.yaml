@@ -3,12 +3,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "<CHARTNAME>.name" . }}-env
+  name: {{ include "<CHARTNAME>.name" $ }}-env
   labels:
-    app.kubernetes.io/name: {{ include "<CHARTNAME>.name" . }}
+    app.kubernetes.io/name: {{ include "<CHARTNAME>.name" $ }}
     app.kubernetes.io/instance: {{ .Release.Name }}
 data:
-  {{- range $key, $val := .Values.configMapEnv }}
+  {{- range $key, $val := $.Values.configMapEnv }}
   {{ $key }}: {{ $val | quote }}
   {{- end }}
 {{ end }}
