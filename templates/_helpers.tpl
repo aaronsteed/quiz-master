@@ -49,12 +49,18 @@ Selector labels
 app.kubernetes.io/name: {{ include "<CHARTNAME>.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
-{{- define "hasHttpService" -}}
+
+{{/*
+hasHttpService checks if the chart has a service named http
+and determines if readiness and liveness probes should be enabled.
+*/}}
+{{- define "<CHARTNAME>.hasHttpService" -}}
 {{- $services := . -}}
+{{- $found := false -}}
 {{- range $services }}
-  {{- if eq .name "http" }}
-    true
+  {{- if and (hasKey . "name") (eq .name "http") }}
+    {{- $found = true -}}
   {{- end }}
 {{- end }}
-false
+{{- $found -}}
 {{- end }}

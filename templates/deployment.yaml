@@ -34,9 +34,9 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          {{- if .Values.environment_variables }}
+          {{- if .Values.env }}
           env:
-            {{- range $key, $value := .Values.environment_variables }}
+            {{- range $key, $value := .Values.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
@@ -53,7 +53,7 @@ spec:
               containerPort: {{ .port }}
               protocol: {{ .protocol }}
             {{ end }}
-          {{- if eq (include "hasHttpService" .Values.new_service) "true" }}
+          {{- if eq (include "<CHARTNAME>.hasHttpService" .Values.service) "true" }}
           livenessProbe:
             httpGet:
               path: /
