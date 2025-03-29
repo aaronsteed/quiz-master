@@ -1,3 +1,4 @@
+{{ range .Values.new_service }}
 ---
 apiVersion: v1
 kind: Service
@@ -6,11 +7,12 @@ metadata:
   labels:
     {{- include "<CHARTNAME>.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
+    - port: {{ .port }}
+      targetPort: {{ .name }}
+      protocol: {{ .protocol }}
+      name: {{ .name }}
   selector:
     {{- include "<CHARTNAME>.selectorLabels" . | nindent 4 }}
+{{ end }}

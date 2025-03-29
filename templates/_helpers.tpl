@@ -49,3 +49,12 @@ Selector labels
 app.kubernetes.io/name: {{ include "<CHARTNAME>.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+{{- define "hasHttpService" -}}
+{{- $services := . -}}
+{{- range $services }}
+  {{- if eq .name "http" }}
+    true
+  {{- end }}
+{{- end }}
+false
+{{- end }}

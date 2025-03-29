@@ -1,26 +1,31 @@
-{{ range .Values.storage }}
+{{ range .Values.new_storage }}
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-    name: {{ .pv.name }}
+    name: {{ .name }}-pv
     labels:
-      storageType: "hdd"
-      volumeType: "nfs"
-      applicationServed: {{ .pv.applicationServed }}
-      storageType: {{ .pv.storageType }}
+      appServed: {{ .appServed }} 
+      storageType: {{ .type }}
 spec:
   capacity:
-    storage: {{ .pv.capacity }}
+    storage: {{ .capacity | default "500Mi" }}
   volumeMode: Filesystem
   accessModes:
-    - {{ .pv.accessMode }}
-  persistentVolumeReclaimPolicy: {{ .pv.reclaimPolicy }}
-  storageClassName: {{ .pv.storageClassName }}
+    - {{ .accessMode | default "ReadWriteMany" }}
+  persistentVolumeReclaimPolicy: {{ .reclaimPolicy | default "Retain" }}
+  storageClassName: {{ .type }}
+  {{- if eq .type "nfs" }}
   mountOptions:
     - hard
     - nfsvers=4.1
   nfs:
-    path: {{ .pv.nfsPath }}
-    server: {{ .pv.server }}
+    path: "{{ $.Values.nfs.default_path }}/{{ .appServed }}"
+    server: {{ $.Values.nfs.server }}
+  {{- end }}
+
+  {{- if eq .type "local-path" }}
+  hostPath:
+    path: {{ $.Values.jam.default_path }}/{{ .appServed }}
+  {{- end }}
 {{ end }}

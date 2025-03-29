@@ -34,11 +34,26 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{- if .Values.environment_variables }}
+          env:
+            {{- range $key, $value := .Values.environment_variables }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.configMapEnv }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "<CHARTNAME>.fullname" . }}-env
+          {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
+            {{ range .Values.new_service }}
+            - name: {{ .name }}
+              containerPort: {{ .port }}
+              protocol: {{ .protocol }}
+            {{ end }}
+          {{- if eq (include "hasHttpService" .Values.new_service) "true" }}
           livenessProbe:
             httpGet:
               path: /
@@ -47,13 +62,14 @@ spec:
             httpGet:
               path: /
               port: http
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - mountPath: /config
-              name: <CHARTNAME>-config
-            - mountPath: /storage
-              name: <CHARTNAME>-storage
+          {{ range $.Values.new_storage }}
+            - mountPath: {{ .container_path }}
+              name: {{ .name }}
+          {{ end }}
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

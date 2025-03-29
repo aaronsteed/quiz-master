@@ -1,19 +1,19 @@
-{{- range .Values.storage }}
+{{- range .Values.new_storage }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .pvc.name }}
+  name: {{ .name }}-pvc
 spec:
   accessModes:
-    - ReadWriteMany
+    - {{ .accessMode | default "ReadWriteMany" }}
   volumeMode: Filesystem
   resources:
     requests:
-      storage: {{ .pvc.size }}
-  storageClassName: {{ .pvc.storageClassName }}
+      storage: {{ .capacity | default "500Mi" }}
+  storageClassName: {{ .type }}
   selector:
     matchLabels:
-      applicationServed: {{ .pv.applicationServed }}
-      storageType: {{ .pv.storageType }}
+      applicationServed: {{ .appServed }}
+      storageType: {{ .type }}
 {{ end }}
