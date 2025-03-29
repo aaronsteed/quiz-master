@@ -1,4 +1,4 @@
-{{- range .Values.new_storage }}
+{{- range .Values.storage }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

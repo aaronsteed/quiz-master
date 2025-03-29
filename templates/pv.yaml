@@ -1,4 +1,4 @@
-{{ range .Values.new_storage }}
+{{ range .Values.storage }}
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -26,6 +26,6 @@ spec:
 
   {{- if eq .type "local-path" }}
   hostPath:
-    path: {{ $.Values.jam.default_path }}/{{ .appServed }}
+    path: {{ $.Values.local_path.default_path }}/{{ .appServed }}
   {{- end }}
 {{ end }}
