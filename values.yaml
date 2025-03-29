@@ -55,20 +55,17 @@ tolerations: []
 
 affinity: {}
 
-environment_variables: []
+# Defined inline in the deployment of the application
+env: {}
 # Example:
-# - name: SECRET_KEY
-#   value: "12345678"
-# - name: APP_NAME
-#   value: test
+#   SECRET_KEY: "12345678"
+#   APP_NAME: test
 
 # Environment from Config Maps. Will create the config map and inject into the container
-configMapEnv: []
+configMapEnv: {}
 # Example:
-# - name: SECRET_KEY
-#   value: "12345678"
-# - name: APP_NAME
-#   value: test
+#   SECRET_KEY: "12345678"
+#   APP_NAME: test
 
 # Creates the PVCs, the PVs and mounts them correctly into the container
 # Optional keys include `capacity` (500Mi, 50Gi), `accessMode` (ReadWriteMany), `reclaimPolicy` (Retain)
