@@ -1,0 +1,14 @@
+{{ if .Values.configMapEnv }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "[[ chart.name ]].name" $ }}-env
+  labels:
+    app.kubernetes.io/name: {{ include "[[ chart.name ]].name" $ }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  {{- range $key, $val := $.Values.configMapEnv }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+{{ end }}

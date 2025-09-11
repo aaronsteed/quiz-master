@@ -1,16 +1,9 @@
-# helm-starter
-Helm Starter for Home Server Applications
+# quiz-master
+An interactive CLI to create home server applications as Helm Charts
 
-## How to use Helm Starter
-Install Helm Starter Plugin
-https://github.com/salesforce/helm-starter
+## Local Development
+### Create portable executable
+```bash
+make build-exec
 ```
-helm plugin install https://github.com/salesforce/helm-starter.git
-```
-```
-helm starter fetch git@github.com:aaronsteed/helm-starter.git
-```
-
-```
-helm create <name-of-helm-chart> --starter chart-starter
-```
+Portable executable will be created in `./dist/quiz-master`
