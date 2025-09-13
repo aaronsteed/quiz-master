@@ -5,7 +5,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('data/chart-starter', 'data/chart-starter')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

@@ -1,0 +1,95 @@
+# Default values for chart
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: 
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+# Example:
+#  kubernetes.io/hostname: k3s-master
+
+tolerations: []
+
+affinity: {}
+
+# Defined inline in the deployment of the application
+env: {}
+# Example:
+#   SECRET_KEY: "12345678"
+#   APP_NAME: test
+
+# Environment from Config Maps. Will create the config map and inject into the container
+configMapEnv: {}
+# Example:
+#   SECRET_KEY: "12345678"
+#   APP_NAME: test
+
+# Creates the PVCs, the PVs and mounts them correctly into the container
+# Optional keys include `capacity` (500Mi, 50Gi), `accessMode` (ReadWriteMany), `reclaimPolicy` (Retain)
+# Below are the required values
+storage:
+  
+# Example:
+#  - name: glance-config
+#    appServed: glance
+#    container_path: /config
+#    type: local-path
+
+service:
+  
+# Example: 
+#  - type: ClusterIP # or LoadBalancer
+#    port: 8080
+#    protocol: TCP
+#    name: http
+# Note: One port MUST be called `http` in order to enable readiness/liveness probes
+
+nfs:
+  default_path: /volume1/nfs/k3s/
+  server: 192.168.1.101
+
+local_path:
+  default_path: "/k3s/local-path"

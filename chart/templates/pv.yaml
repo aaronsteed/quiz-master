@@ -1,0 +1,32 @@
+{{ range .Values.storage }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: {{ .name }}-pv
+    labels:
+      appServed: {{ .appServed }}
+      configServed: {{ .name }}
+      storageType: {{ .type }}
+spec:
+  capacity:
+    storage: {{ .capacity | default "500Mi" }}
+  volumeMode: Filesystem
+  accessModes:
+    - {{ .accessMode | default "ReadWriteMany" }}
+  persistentVolumeReclaimPolicy: {{ .reclaimPolicy | default "Retain" }}
+  storageClassName: {{ .type }}
+  {{- if eq .type "nfs" }}
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: "{{ $.Values.nfs.default_path }}/{{ .appServed }}"
+    server: {{ $.Values.nfs.server }}
+  {{- end }}
+
+  {{- if eq .type "local-path" }}
+  hostPath:
+    path: {{ $.Values.local_path.default_path }}/{{ .appServed }}
+  {{- end }}
+{{ end }}
