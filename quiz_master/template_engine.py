@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from jinja2 import Environment, FileSystemLoader
 import os
 import sys
-from os import path
 
 DEFAULT_HOST_PATH = "/k3s/local-path"
 DEFAULT_NFS_PATH = "/volume1/nfs/k3s"
