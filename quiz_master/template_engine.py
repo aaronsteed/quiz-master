@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from jinja2 import Environment, FileSystemLoader
 import os
+import sys
 
 DEFAULT_HOST_PATH = "/k3s/local-path"
 DEFAULT_NFS_PATH = "/volume1/nfs/k3s"
@@ -51,15 +52,29 @@ class Chart:
     service: Service
 
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and PyInstaller """
+    if hasattr(sys, "_MEIPASS"):
+        # Running from PyInstaller bundle
+        base_path = sys._MEIPASS
+    else:
+        # Running in normal Python
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+
 def templatable_files():
     appended_files = []
-    chart_starter_dir = os.path.join(os.path.dirname(__file__), 'chart-starter')
+    chart_starter_dir = resource_path('data/chart-starter')
+    os.listdir(chart_starter_dir)
+    print(chart_starter_dir)
     for root, dirs, files in os.walk(chart_starter_dir):
         for filename in files:
             # Get the relative path from chart-starter to the file
             rel_dir = os.path.relpath(root, chart_starter_dir)
             rel_path = os.path.join(rel_dir, filename) if rel_dir != '.' else filename
             appended_files.append(rel_path)
+    print(appended_files)
     return appended_files
 
 
@@ -69,6 +84,7 @@ class TemplateEngine:
 
     def render_and_output(self):
         files = templatable_files()
+        template_dir = resource_path('data/chart-starter')
         env = Environment(
             block_start_string='[%',
             block_end_string='%]',
@@ -76,11 +92,12 @@ class TemplateEngine:
             variable_end_string=']]',
             comment_start_string='[#',
             comment_end_string='#]',
-            loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), 'chart-starter')))
+            loader=FileSystemLoader(template_dir))
         for filename in files:
             template = env.get_template(filename)
             output = template.render(chart=self.chart, service=self.chart.service)
             output_path = os.path.join(os.getcwd(), self.chart.name, filename)
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            print(f"Writing {self.chart.name} to {output_path}")
             with open(output_path, 'w') as f:
                 f.write(output)

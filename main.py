@@ -72,7 +72,7 @@ def port_question() -> Port:
     port_number = questionary.text("what port does the service use").ask()
     port_name = questionary.text("Name for the port number").ask()
     port_type = questionary.select("What type of port do you want to use?", choices=["ClusterIP", "LoadBalancer"]).ask()
-    protocol = questionary.select("what protocol do you want to use?", choices=["udp", "tcp"]).ask()
+    protocol = questionary.select("what protocol do you want to use?", choices=["UDP", "TCP"]).ask()
     return Port(int(port_number), port_name, protocol, port_type)
 
 def service_questions(app_name: str) -> Service:
