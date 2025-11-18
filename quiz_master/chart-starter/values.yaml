@@ -76,11 +76,13 @@ storage:
       appServed: [[ chart.name ]]
       container_path: [[ volume.container_path ]]
       type: [[ volume.type ]]
+      subpath: [[ volume.volume_mount_name ]]
   [% endfor %]
 # Example:
 #  - name: glance-config
 #    appServed: glance
 #    container_path: /config
+#    subpath: /config
 #    type: local-path
 
 service:

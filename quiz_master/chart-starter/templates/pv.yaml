@@ -21,12 +21,12 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: "{{ $.Values.nfs.default_path }}/{{ .appServed }}"
+    path: "{{ $.Values.nfs.default_path }}/{{ .appServed }}/{{ .subpath }}"
     server: {{ $.Values.nfs.server }}
   {{- end }}
 
   {{- if eq .type "local-path" }}
   hostPath:
-    path: {{ $.Values.local_path.default_path }}/{{ .appServed }}
+    path: {{ $.Values.local_path.default_path }}/{{ .appServed }}/{{ .subpath }}
   {{- end }}
 {{ end }}
