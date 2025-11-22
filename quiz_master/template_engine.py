@@ -81,6 +81,7 @@ class TemplateEngine:
             template = env.get_template(filename)
             output = template.render(chart=self.chart, service=self.chart.service)
             output_path = os.path.join(os.getcwd(), self.chart.name, filename)
+            print("Writing file to:", output_path)
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
             with open(output_path, 'w') as f:
                 f.write(output)
