@@ -1,4 +1,6 @@
 import questionary
+import os
+import yaml
 from quiz_master.template_engine import TemplateEngine, Chart, Image, Service, Port, Volume, DEFAULT_HOST_PATH, DEFAULT_NFS_PATH
 
 class VolumeBuilder:
@@ -71,6 +73,57 @@ def image_questions() -> Image:
 def resolved_k8s_service_name(app_name: str, port_name: str) -> str:
     return f"{app_name}-{port_name}"
 
+def route_questions(service: Service) -> None:
+
+    # detect if routes chart is available
+    # check if routes directory exists in current directory
+    routes_dir = os.path.join(os.getcwd(), "routes")
+    if not os.path.isdir(routes_dir):
+        print("No `routes` directory found in the current path; skipping route configuration.")
+        return None
+
+    needs_route = questionary.confirm("Do you need routes?").ask()
+    if needs_route:
+        values_file = os.path.join(routes_dir, "values.yaml")
+        if os.path.exists(values_file):
+            with open(values_file, "r", encoding="utf-8") as f:
+                try:
+                    values = yaml.safe_load(f)
+                except Exception:
+                    print("Failed to parse `values.yaml`; skipping route configuration.")
+                    return None
+
+        first_tcp_route = next((port for port in service.ports if port.protocol == "TCP"), None)
+        if first_tcp_route is None:
+            print("No TCP ports found in the service; skipping route configuration.")
+            return None
+
+        name = questionary.text("Route name").ask()
+        subdomain = questionary.text("Subdomain").ask()
+        auth_enabled = questionary.confirm("Enable auth for this route?").ask()
+        service = f"{service.name}-{first_tcp_route.name}"
+        port = first_tcp_route.port
+        namespace = "default"
+        skip_verify = questionary.confirm("Skip TLS verification for this route?").ask()
+
+        route = {
+            "name": name,
+            "subdomain": subdomain,
+            "authEnabled": bool(auth_enabled),
+            "service": service,
+            "port": int(port)
+        }
+        if namespace:
+            route["namespace"] = namespace
+        if skip_verify:
+            route["skipVerify"] = True
+
+        values["routes"].append(route)
+
+        with open(values_file, "w", encoding="utf-8") as f:
+            yaml.safe_dump(values, f, sort_keys=False, default_flow_style=False)
+
+
 def port_question(app_name: str) -> Port:
     port_number = questionary.text("what port does the service use").ask()
 
@@ -78,9 +131,6 @@ def port_question(app_name: str) -> Port:
     if len(resolved_k8s_service_name(app_name, port_name)) > 15:
         print(f"Warning: The combined length of app name and port name exceeds 15 characters "
               f"({resolved_k8s_service_name(app_name, port_name)}). This may cause issues in Kubernetes.")
-    while len(resolved_k8s_service_name(app_name, port_name)) > 15:
-        print("Please choose a shorter port name.")
-        port_name = questionary.text("Name for the port number").ask()
 
     port_type = questionary.select("What type of port do you want to use?", choices=["ClusterIP", "LoadBalancer"]).ask()
     protocol = questionary.select("what protocol do you want to use?", choices=["UDP", "TCP"]).ask()
@@ -100,6 +150,7 @@ def main():
     image = image_questions()
     volumes = volume_questions(chart_name)
     service = service_questions(chart_name)
+    route_questions(service)
 
 
     chart = Chart(
