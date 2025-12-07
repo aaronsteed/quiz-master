@@ -68,15 +68,26 @@ def image_questions() -> Image:
     return Image(repository=repository, tag=tag)
 
 
-def port_question() -> Port:
+def resolved_k8s_service_name(app_name: str, port_name: str) -> str:
+    return f"{app_name}-{port_name}"
+
+def port_question(app_name: str) -> Port:
     port_number = questionary.text("what port does the service use").ask()
+
     port_name = questionary.text("Name for the port number").ask()
+    if len(resolved_k8s_service_name(app_name, port_name)) > 15:
+        print(f"Warning: The combined length of app name and port name exceeds 15 characters "
+              f"({resolved_k8s_service_name(app_name, port_name)}). This may cause issues in Kubernetes.")
+    while len(resolved_k8s_service_name(app_name, port_name)) > 15:
+        print("Please choose a shorter port name.")
+        port_name = questionary.text("Name for the port number").ask()
+
     port_type = questionary.select("What type of port do you want to use?", choices=["ClusterIP", "LoadBalancer"]).ask()
-    protocol = questionary.select("what protocol do you want to use?", choices=["udp", "tcp"]).ask()
+    protocol = questionary.select("what protocol do you want to use?", choices=["UDP", "TCP"]).ask()
     return Port(int(port_number), port_name, protocol, port_type)
 
 def service_questions(app_name: str) -> Service:
-    ports = [port_question()]
+    ports = [port_question(app_name)]
     needs_more_ports = questionary.confirm("Do you need more ports?").ask()
     while needs_more_ports:
         ports.append(port_question())
